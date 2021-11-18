@@ -4,6 +4,9 @@
 export default {
     name: "App",
     components: {},
+    mounted() {
+        this.$store.dispatch("GET_TEXT_FROM_API");
+    },
 };
 </script>
 
