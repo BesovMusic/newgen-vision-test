@@ -1,68 +1,146 @@
 <template>
-    <div class="container">
-        <div class="text">
-            <span class="text__item" v-for="(symbol, index) in splitedText" :key="index" :class="{ current: currentSymbol == index }">{{ symbol }}</span>
-        </div>
-    </div>
+	<div class="page">
+		<div class="container">
+			<div class="contentWrapper shadow">
+				<Info @restart="restart"/>
+				<div class="textWrapper">
+					<Row
+						v-for="(row, index) in rows"
+						:key="index"
+						:rowData="row"
+						:rowIndex="index"
+					/>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
+import { GET_TEXT } from './store/index';
+import { mapGetters } from 'vuex';
+import Row from './components/Row.vue';
+import Info from './components/Info.vue';
+
 export default {
-    name: "App",
-    data() {
-        return {
-            currentSymbol: 0,
-        };
-    },
-    computed: {
-        splitedText() {
-            let splitedText = this.$store.state.text.split("");
-            return splitedText;
-        },
-    },
-    methods: {
-        buttonPressed(e) {
-            let currentSpan = document.querySelectorAll(".text__item");
-            if (currentSpan[this.currentSymbol].innerText == "") {
-                this.currentSymbol++;
-            } else {
-                if (e.key == currentSpan[this.currentSymbol].innerText) {
-                    this.currentSymbol++;
-                } else {
-                    currentSpan[this.currentSymbol].classList.add("wrong");
-                }
-            }
-        },
-    },
-    mounted() {
-        this.$store.dispatch("GET_TEXT_FROM_API");
-        document.addEventListener("keyup", this.buttonPressed);
-    },
+	name: 'App',
+	components: {
+		Row,
+		Info
+	},
+	computed: {
+		...mapGetters(['text', 'currentSymbolIndex', 'currentRowIndex']),
+		rows() {
+			let rows = this.text.split('  ');
+			return rows.map((row) => {
+				const rowData = row.split('');
+				return rowData;
+			});
+		},
+		currentSymbol() {
+			return this.currentRow[this.currentSymbolIndex];
+		},
+		currentRow() {
+			return this.rows[this.currentRowIndex];
+		},
+	},
+	methods: {
+		buttonPressCallback({ key }) {
+			if (key === 'Shift') {
+				return;
+			}
+			if (!(key === this.currentSymbol)) {
+				this.$store.state.isWrong = true;
+				this.$store.state.errorCounter++
+				return;
+			}
+			this.$store.state.currentSymbolIndex++;
+			this.$store.state.isWrong = false;
+			if (
+				this.$store.state.currentSymbolIndex ===
+				this.currentRow.length
+			) {
+				this.endgameCallback();
+			}
+			if (
+				this.$store.state.currentRowIndex === this.rows.length &&
+				this.$store.state.currentSymbolIndex === 0
+			) {
+				alert('Success');
+				this.restart();
+			}
+		},
+		endgameCallback(isRestore = false) {
+			this.$store.state.currentRowIndex = isRestore
+				? 0
+				: this.$store.state.currentRowIndex + 1;
+			this.$store.state.currentSymbolIndex = 0;
+		},
+		restart() {
+			this.$store.dispatch(GET_TEXT);
+			this.endgameCallback(true);
+			this.$store.state.errorCounter = 0;
+			this.$store.state.isWrong = false;
+		},
+	},
+	created() {
+		this.$store.dispatch(GET_TEXT);
+		document.addEventListener('keyup', this.buttonPressCallback);
+	},
 };
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
+	font-family: Avenir, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-align: center;
+	color: #2c3e50;
+}
+.page {
+	padding-top: 10vh;
+	padding-bottom: 10vh;
+	background-color: #e8ebff;
+	min-height: 100vh;
+}
+.contentWrapper {
+	border-radius: 10px;
+	padding: 20px;
+	width: 80%;
+	margin: 0 auto;
+	background-color: #fff;
 }
 .text {
-    font-size: 18px;
-    font-family: monospace;
+	padding: 2px;
+	font-size: 18px;
+	font-family: 'Roboto Mono', monospace;
+	opacity: 0.5;
+	border-radius: 10px;
+	transition: opacity .2s ease-in-out, background .2s ease-in-out, transform .2s ease-in-out;
+	transform: scale(0.95);
+}
+.text__item {
+	border-radius: 4px;
+}
+.currentRow {
+	box-shadow: inset 2px 2px 5px rgba(154, 147, 140, 0.5), 1px 1px 5px rgba(255, 255, 255, 1);
+	opacity: 1;
+	background: #e8ebff;
+	transform: scale(1);
 }
 .current {
-    background: green;
-    color: white;
+	background: green;
+	color: white;
 }
 .wrong {
-    background: red;
-    color: white;
+	background: red;
+	color: white;
 }
 .success {
-    color: green;
+	color: green;
 }
 </style>

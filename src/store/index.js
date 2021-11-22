@@ -1,31 +1,51 @@
-import { createStore } from "vuex";
-import axios from "axios";
+import { createStore } from 'vuex';
+import axios from 'axios';
+
+export const GET_TEXT = 'getAction';
 
 export default createStore({
-    state: {
-        text: "",
-    },
-    mutations: {
-        SET_TEXT_TO_STATE: (state, text) => {
-            state.text = text.data;
-        },
-    },
-    getters: {
-        TEXT(state) {
-            return state.text;
-        },
-    },
-    actions: {
-        GET_TEXT_FROM_API({ commit }) {
-            axios
-                .get("https://baconipsum.com/api/?type=all-meat&paras=1&format=text")
-                .then((text) => {
-                    commit("SET_TEXT_TO_STATE", text);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        },
-    },
-    modules: {},
+	state: {
+		text: '',
+		currentRowIndex: 0,
+		currentSymbolIndex: 0,
+		isWrong: false,
+		errorCounter: 0,
+	},
+	mutations: {
+		SET_TEXT_TO_STATE: (state, text) => {
+			state.text = text.data;
+		},
+	},
+	getters: {
+		text(state) {
+			return state.text;
+		},
+		currentRowIndex(state) {
+			return state.currentRowIndex;
+		},
+		currentSymbolIndex(state) {
+			return state.currentSymbolIndex;
+		},
+		isWrong(state) {
+			return state.isWrong;
+		},
+		errors(state) {
+			return state.errorCounter;
+		},
+		
+	},
+	actions: {
+		getAction({ commit }) {
+			axios
+				.get('https://baconipsum.com/api/?type=all-meat&paras=1&format=text')
+				.then((text) => {
+					commit('SET_TEXT_TO_STATE', text);
+				})
+				.catch((error) => {
+					console.log(error);
+					alert(error);
+				});
+		},
+	},
+	modules: {},
 });
