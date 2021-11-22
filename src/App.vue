@@ -2,9 +2,10 @@
 	<div class="page">
 		<div class="container">
 			<div class="contentWrapper shadow">
-				<div class="gameScreen">	
-					<Info @restart="restart"/>
-					<div class="textWrapper">
+				<div class="gameScreen">
+					<h2 class="endgameTitle" v-show="!game">Ваш результат:</h2>	
+					<Info @restart="restart" @fastEnd="fastEnd"/>
+					<div class="textWrapper" v-if="game">
 						<Row
 							v-for="(row, index) in rows"
 							:key="index"
@@ -29,6 +30,12 @@ export default {
 	components: {
 		Row,
 		Info
+	},
+	data() {
+		return {
+			game: true,
+			interval: null,
+		}
 	},
 	computed: {
 		...mapGetters(['text', 'currentSymbolIndex', 'currentRowIndex']),
@@ -69,8 +76,8 @@ export default {
 				this.$store.state.currentRowIndex === this.rows.length &&
 				this.$store.state.currentSymbolIndex === 0
 			) {
-				alert('Success');
-				this.restart();
+				this.game = false;
+				this.stopGame();
 			}
 		},
 		endgameCallback(isRestore = false) {
@@ -85,11 +92,29 @@ export default {
 			this.$store.state.errorCounter = 0;
 			this.$store.state.isWrong = false;
 			this.$store.state.enteredСharacters = 0;
+			this.game = true;
+			this.startGame();
+		},
+		fastEnd() {
+			this.$store.state.currentRowIndex = this.rows.length - 1;
+			this.$store.state.currentSymbolIndex = this.currentRow.length -1;
+		},
+		startGame() {
+			this.$store.state.currentTime = 0;
+			this.interval = setInterval(this.tick, 1000);
+			document.addEventListener('keyup', this.buttonPressCallback);
+		},
+		stopGame() {
+			clearInterval(this.interval);
+			document.removeEventListener('keyup', this.buttonPressCallback);
+		},
+		tick() {
+			this.$store.state.currentTime++
 		},
 	},
 	created() {
 		this.$store.dispatch(GET_TEXT);
-		document.addEventListener('keyup', this.buttonPressCallback);
+		this.startGame();
 	},
 };
 </script>
@@ -117,6 +142,13 @@ export default {
 	width: 80%;
 	margin: 0 auto;
 	background-color: #fff;
+}
+.endgameTitle {
+	padding-bottom: 5px;
+	font-weight: bold;
+}
+.textWrapper {
+	margin-top: 20px;
 }
 .text {
 	padding: 2px;
