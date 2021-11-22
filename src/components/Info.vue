@@ -17,7 +17,7 @@
                 <div class="col-4 infoWrapper__icon"><i class="bi bi-speedometer"></i></div>
                 <div class="col-8 infoWrapper__content">
                     <p>Скорость</p>
-                    <span>0 зн/мин.</span>
+                    <span>{{typingSpeed}} зн/мин.</span>
                 </div>
             </div>
         </div>
@@ -47,17 +47,30 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'Info',
     computed: {
-        ...mapGetters(['text', 'errors']),
+        ...mapGetters(['text', 'errors', 'enteredСharacters', 'currentTime']),
         accurancy() {
 			let symbols = this.text.split('').length;
 			let accurancy = Math.floor(((symbols - this.errors) / symbols) * 100); 
 			return accurancy;
 		},
+        typingSpeed() {
+            let typingSpeed = Math.floor(this.enteredСharacters / (this.currentTime / 60))
+            return typingSpeed;
+        }
     },
     methods: {
         restart() {
             this.$emit('restart');
+        },
+        timer() {
+            setInterval(this.tick, 1000);
+        },
+        tick() {
+            this.$store.state.currentTime++
         }
+    },
+    mounted() {
+        this.timer();
     }
 }
 </script>

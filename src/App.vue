@@ -2,14 +2,16 @@
 	<div class="page">
 		<div class="container">
 			<div class="contentWrapper shadow">
-				<Info @restart="restart"/>
-				<div class="textWrapper">
-					<Row
-						v-for="(row, index) in rows"
-						:key="index"
-						:rowData="row"
-						:rowIndex="index"
-					/>
+				<div class="gameScreen">	
+					<Info @restart="restart"/>
+					<div class="textWrapper">
+						<Row
+							v-for="(row, index) in rows"
+							:key="index"
+							:rowData="row"
+							:rowIndex="index"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -56,6 +58,7 @@ export default {
 			}
 			this.$store.state.currentSymbolIndex++;
 			this.$store.state.isWrong = false;
+			this.$store.state.enteredСharacters++
 			if (
 				this.$store.state.currentSymbolIndex ===
 				this.currentRow.length
@@ -81,6 +84,7 @@ export default {
 			this.endgameCallback(true);
 			this.$store.state.errorCounter = 0;
 			this.$store.state.isWrong = false;
+			this.$store.state.enteredСharacters = 0;
 		},
 	},
 	created() {

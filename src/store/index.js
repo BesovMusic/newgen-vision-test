@@ -10,6 +10,8 @@ export default createStore({
 		currentSymbolIndex: 0,
 		isWrong: false,
 		errorCounter: 0,
+		currentTime: 1,
+		enteredСharacters: 0,
 	},
 	mutations: {
 		SET_TEXT_TO_STATE: (state, text) => {
@@ -31,6 +33,12 @@ export default createStore({
 		},
 		errors(state) {
 			return state.errorCounter;
+		},
+		enteredСharacters(state) {
+			return state.enteredСharacters;
+		},
+		currentTime(state) {
+			return state.currentTime;
 		},
 		
 	},
