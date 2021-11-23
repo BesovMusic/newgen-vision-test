@@ -66,8 +66,6 @@ export default {
 			this.$emit('fastEnd');
 		}
 	},
-	mounted() {
-	}
 }
 </script>
 

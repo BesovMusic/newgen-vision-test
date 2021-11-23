@@ -1,20 +1,30 @@
 <template>
 	<div class="page">
-		<div class="container">
-			<div class="contentWrapper shadow">
-				<div class="gameScreen">
-					<h2 class="endgameTitle" v-show="!game">Ваш результат:</h2>	
-					<Info @restart="restart" @fastEnd="fastEnd"/>
-					<div class="textWrapper" v-if="game">
-						<Row
-							v-for="(row, index) in rows"
-							:key="index"
-							:rowData="row"
-							:rowIndex="index"
-						/>
+		<div class="container" >
+			<transition name="fade" mode="out-in">
+				<div class="contentWrapper shadow" v-if="!gameStarted">
+					<div class="startScreen">
+						<h1 style="font-weight: bold;">Тренажер слепой печати</h1>
+						<p>Перед началом игры, не забудте поменять раскладку клавиатуры на <b>ENG</b></p>
+						<button class="btn btn-success btn-lg" @click="startGame">Начать печатать</button>
 					</div>
 				</div>
-			</div>
+				<div class="contentWrapper shadow" v-else>
+					<div class="gameScreen">
+						<h2 class="endgameTitle" v-show="gameEnded">Ваш результат:</h2>
+						<Info @restart="restart" @fastEnd="fastEnd"/>
+						<div class="textWrapper" v-show="!gameEnded">
+							<Row
+								v-for="(row, index) in rows"
+								:key="index"
+								:rowData="row"
+								:rowIndex="index"
+							/>
+						</div>
+						
+					</div>
+				</div>
+			</transition>
 		</div>
 	</div>
 </template>
@@ -33,7 +43,8 @@ export default {
 	},
 	data() {
 		return {
-			game: true,
+			gameStarted: false,
+			gameEnded: false,
 			interval: null,
 		}
 	},
@@ -92,7 +103,7 @@ export default {
 			this.$store.state.errorCounter = 0;
 			this.$store.state.isWrong = false;
 			this.$store.state.enteredСharacters = 0;
-			this.game = true;
+			this.gameEnded = false;
 			this.startGame();
 		},
 		fastEnd() {
@@ -103,10 +114,12 @@ export default {
 			this.$store.state.currentTime = 0;
 			this.interval = setInterval(this.tick, 1000);
 			document.addEventListener('keyup', this.buttonPressCallback);
+			this.gameStarted = true;
 		},
 		stopGame() {
 			clearInterval(this.interval);
 			document.removeEventListener('keyup', this.buttonPressCallback);
+			this.gameEnded = true;
 		},
 		tick() {
 			this.$store.state.currentTime++
@@ -114,7 +127,6 @@ export default {
 	},
 	created() {
 		this.$store.dispatch(GET_TEXT);
-		this.startGame();
 	},
 };
 </script>
@@ -122,6 +134,16 @@ export default {
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .6s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
 
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -169,14 +191,15 @@ export default {
 	transform: scale(1);
 }
 .current {
-	background: green;
+	background: #5bc538;
 	color: white;
+	padding: 0 3px;
 }
 .wrong {
 	background: red;
 	color: white;
 }
 .success {
-	color: green;
+	color: #5bc538;
 }
 </style>
