@@ -1,24 +1,32 @@
-# newgen-vision-test
+# Тренажер слепой печати
 
-## Project setup
+Тестовое задание для компании NewGen Vision
+
+### Приложение доступно для просмотра по [ссылке](https://besovmusic.github.io/newgen-vision-test/dist/)
+---
+
+## Используемые технологии
+
+- Vue CLI 3
+- Vuex
+- Bootstrap 5
+
+### Установка зависимостей
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Компиляция и hot-reloads для разработки
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Сборка и минификация файлов для продакшена
 ```
 npm run build
 ```
 
-### Lints and fixes files
+### Проверка кода с помощью линтера
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
